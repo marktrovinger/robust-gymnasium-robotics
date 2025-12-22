@@ -17,6 +17,7 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
     && uv venv --python 3.11 --prompt 🦾 venv \
     && . venv/bin/activate \
     && uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128 \
+    && uv pip install tyro \
     && uv pip install jax[cuda12] \
     && cd Robust-Gymnasium \
     && uv pip install -r requirements.txt  \
