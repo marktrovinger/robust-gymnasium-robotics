@@ -19,6 +19,7 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
     && uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128 \
     && uv pip install tyro \
     && uv pip install jax[cuda12] \
+    && uv pip install tensorboard \
     && cd Robust-Gymnasium \
     && uv pip install -r requirements.txt  \
     && uv pip install -e .
