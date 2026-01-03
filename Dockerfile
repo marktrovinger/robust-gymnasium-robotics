@@ -24,6 +24,18 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
     && uv pip install -r requirements.txt  \
     && uv pip install -e .
 
+RUN . $HOME/.local/bin/env \
+    && . venv/bin/activate \
+    && apt install -y ninja-build gettext cmake unzip curl  \
+    && git clone --single-branch --depth=1 https://github.com/neovim/neovim \
+    && cd neovim \
+    && make CMAKE_BUILD_TYPE=Release \
+    && make install \
+    && ln -s /usr/local/bin/nvim /usr/bin/nvim \
+    && . $HOME/.local/bin/env \
+    && uv pip install pynvim \
+    && sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+
 # RUN cd Robust-Gymnasium && \
     
 #     uv pip install -e .
