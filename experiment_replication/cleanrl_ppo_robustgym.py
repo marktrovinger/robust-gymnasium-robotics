@@ -182,9 +182,10 @@ if __name__ == "__main__":
     # envs = gym.vector.SyncVectorEnv(
     #     [make_env(args.env_id, i, args.capture_video, run_name, args.gamma) for i in range(args.num_envs)]
     # )
-    envs = gym.vector.SyncVectorEnv(
-        [make_env(robust_args.env_name, i, args.capture_video, run_name, args.gamma) for i in range(args.num_envs)]
-     )
+    # envs = gym.vector.SyncVectorEnv(
+    #     [make_env(robust_args.env_name, i, args.capture_video, run_name, args.gamma) for i in range(args.num_envs)]
+    # )
+    envs = gym.make_vec(robust_args.env_name, num_envs=3, vectorization_mode="sync", wrappers=(gym.wrappers.TimeAwareObservation,))
     
     # env = gym.make(robust_args.env_name)
     
@@ -236,6 +237,7 @@ if __name__ == "__main__":
 
             # TRY NOT TO MODIFY: execute the game and log data.
             next_obs, reward, terminations, truncations, infos = envs.step(robust_input)
+            #next_obs, reward, terminations, truncations, infos = envs.step(action.cpu().numpy())
             next_done = np.logical_or(terminations, truncations)
             rewards[step] = torch.tensor(reward).to(device).view(-1)
             next_obs, next_done = torch.Tensor(next_obs).to(device), torch.Tensor(next_done).to(device)
