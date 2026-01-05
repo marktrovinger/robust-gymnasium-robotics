@@ -97,7 +97,7 @@ def make_env(env_id, idx, capture_video, run_name, gamma):
         env = gym.wrappers.RecordEpisodeStatistics(env)
         env = gym.wrappers.ClipAction(env)
         env = gym.wrappers.NormalizeObservation(env)
-        #env = gym.wrappers.TransformObservation(env, lambda obs: np.clip(obs, -10, 10))
+        env = gym.wrappers.TransformObservation(env= env, func=lambda obs: np.clip(obs, -10, 10), observation_space=None)
         env = gym.wrappers.NormalizeReward(env, gamma=gamma)
         env = gym.wrappers.TransformReward(env, lambda reward: np.clip(reward, -10, 10))
         return env
@@ -182,14 +182,14 @@ if __name__ == "__main__":
     # envs = gym.vector.SyncVectorEnv(
     #     [make_env(args.env_id, i, args.capture_video, run_name, args.gamma) for i in range(args.num_envs)]
     # )
-    # envs = gym.vector.SyncVectorEnv(
-    #     [make_env(robust_args.env_name, i, args.capture_video, run_name, args.gamma) for i in range(args.num_envs)]
-    # )
-    envs = gym.make_vec(robust_args.env_name, num_envs=3, vectorization_mode="sync", wrappers=(gym.wrappers.TimeAwareObservation,))
+    envs = gym.vector.SyncVectorEnv(
+        [make_env(robust_args.env_name, i, args.capture_video, run_name, args.gamma) for i in range(args.num_envs)]
+    )
+    #envs = gym.make_vec(robust_args.env_name, num_envs=3, vectorization_mode="sync", wrappers=(gym.wrappers.TimeAwareObservation,))
     
     # env = gym.make(robust_args.env_name)
     
-    #assert isinstance(env.single_action_space, gym.spaces.Box), "only continuous action space is supported"
+    assert isinstance(envs.single_action_space, gym.spaces.Box), "only continuous action space is supported"
 
     # agent = Agent(env).to(device)
     agent = Agent(envs).to(device)
@@ -208,6 +208,7 @@ if __name__ == "__main__":
     global_step = 0
     start_time = time.time()
     next_obs, _ = envs.reset(seed=args.seed)
+    #next_obs, _ = envs.reset_robust()
     next_obs = torch.Tensor(next_obs).to(device)
     next_done = torch.zeros(args.num_envs).to(device)
 
