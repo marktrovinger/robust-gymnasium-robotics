@@ -192,7 +192,7 @@ if __name__ == "__main__":
     #envs = env = VectorActionInjection(envs, {"robust_type" : "state","robust_config": robust_args})
     
     envs = gym.make(robust_args.env_name)
-    envs = env = ActionInjectionWrapper(envs, {"robust_type" : "state","robust_config": robust_args})
+    envs = ActionInjectionWrapper(envs, {"robust_type" : "state","robust_config": robust_args})
     #envs = gym.make_vec("CartPole-v1", num_envs=3, vectorization_mode="sync", wrappers=(gym.wrappers.TimeAwareObservation,))
 
     
