@@ -14,6 +14,7 @@ import tyro
 from torch.distributions.normal import Normal
 from torch.utils.tensorboard import SummaryWriter
 from robust_gymnasium.configs.robust_setting import get_config
+from action_injection_wrapper import VectorActionInjection, ActionInjectionWrapper
 
 
 @dataclass
@@ -92,14 +93,16 @@ def make_env(env_id, idx, capture_video, run_name, gamma):
             env = gym.make(env_id, render_mode="rgb_array")
             env = gym.wrappers.RecordVideo(env, f"videos/{run_name}")
         else:
-            env = gym.make(env_id)
-        env = gym.wrappers.FlattenObservation(env)  # deal with dm_control's Dict observation space
-        env = gym.wrappers.RecordEpisodeStatistics(env)
-        env = gym.wrappers.ClipAction(env)
-        env = gym.wrappers.NormalizeObservation(env)
-        env = gym.wrappers.TransformObservation(env= env, func=lambda obs: np.clip(obs, -10, 10), observation_space=None)
-        env = gym.wrappers.NormalizeReward(env, gamma=gamma)
-        env = gym.wrappers.TransformReward(env, lambda reward: np.clip(reward, -10, 10))
+            env = gym.make_vec(env_id)
+        #env = VectorActionInjection(env, {"robust_type" : "state","robust_config": robust_args})
+        #env = gym.wrappers.vector.FlattenObservation(env)  # deal with dm_control's Dict observation space
+        #env = gym.wrappers.RecordEpisodeStatistics(env)
+        #env = gym.wrappers.vector.vectorize_action.ClipAction(env)
+        # env = gym.wrappers.vector.NormalizeObservation(env)
+        # env = gym.wrappers.vector.TransformObservation(env= env, func=lambda obs: np.clip(obs, -10, 10), observation_space=None)
+        # env = gym.wrappers.vector.NormalizeReward(env, gamma=gamma)
+        # env = gym.wrappers.vector.TransformReward(env, lambda reward: np.clip(reward, -10, 10))
+        env = VectorActionInjection(env, {"robust_type" : "state","robust_config": robust_args,})
         return env
 
     return thunk
@@ -182,14 +185,18 @@ if __name__ == "__main__":
     # envs = gym.vector.SyncVectorEnv(
     #     [make_env(args.env_id, i, args.capture_video, run_name, args.gamma) for i in range(args.num_envs)]
     # )
-    envs = gym.vector.SyncVectorEnv(
-        [make_env(robust_args.env_name, i, args.capture_video, run_name, args.gamma) for i in range(args.num_envs)]
-    )
-    #envs = gym.make_vec(robust_args.env_name, num_envs=3, vectorization_mode="sync", wrappers=(gym.wrappers.TimeAwareObservation,))
+    # envs = gym.vector.SyncVectorEnv(
+    #     [make_env(robust_args.env_name, i, args.capture_video, run_name, args.gamma) for i in range(args.num_envs)]
+    # )
+    #envs = gym.make_vec(robust_args.env_name, num_envs=1, vectorization_mode="sync")
+    #envs = env = VectorActionInjection(envs, {"robust_type" : "state","robust_config": robust_args})
     
-    # env = gym.make(robust_args.env_name)
+    envs = gym.make(robust_args.env_name)
+    envs = env = ActionInjectionWrapper(envs, {"robust_type" : "state","robust_config": robust_args})
+    #envs = gym.make_vec("CartPole-v1", num_envs=3, vectorization_mode="sync", wrappers=(gym.wrappers.TimeAwareObservation,))
+
     
-    assert isinstance(envs.single_action_space, gym.spaces.Box), "only continuous action space is supported"
+    #assert isinstance(envs.single_action_space, gym.spaces.Box), "only continuous action space is supported"
 
     # agent = Agent(env).to(device)
     agent = Agent(envs).to(device)
@@ -223,6 +230,7 @@ if __name__ == "__main__":
             global_step += args.num_envs
             obs[step] = next_obs
             dones[step] = next_done
+            robust_inputs = []
 
             # ALGO LOGIC: action logic
             with torch.no_grad():
@@ -234,11 +242,12 @@ if __name__ == "__main__":
                 }
                 values[step] = value.flatten()
             actions[step] = action
-            logprobs[step] = logprob
+            #logprobs[step] = logprob
+            robust_inputs.append(robust_input)
 
             # TRY NOT TO MODIFY: execute the game and log data.
-            next_obs, reward, terminations, truncations, infos = envs.step(robust_input)
-            #next_obs, reward, terminations, truncations, infos = envs.step(action.cpu().numpy())
+            #next_obs, reward, terminations, truncations, infos = envs.step(robust_inputs)
+            next_obs, reward, terminations, truncations, infos = envs.step(action.cpu().numpy())
             next_done = np.logical_or(terminations, truncations)
             rewards[step] = torch.tensor(reward).to(device).view(-1)
             next_obs, next_done = torch.Tensor(next_obs).to(device), torch.Tensor(next_done).to(device)
