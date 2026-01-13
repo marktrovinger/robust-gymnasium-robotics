@@ -35,7 +35,8 @@
         		"ms-python.vscode-pylance"
 			],
 			"settings": {
-				"python.defaultInterpreterPath": "/robustmanipulators/venv/bin/python"
+				"python.defaultInterpreterPath": "/robustmanipulators/venv/bin/python",
+				"python.analysis.extraPaths": ["/robustmanipulators/Robust-Gymnasium"]
 			}
 		}
 		
