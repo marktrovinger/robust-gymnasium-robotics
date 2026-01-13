@@ -37,5 +37,6 @@ class ActionInjectionWrapper(gym.ObservationWrapper):
 
     def step(self, action):
         self.robust_input["action"] = action
-        observation, reward, terminated, truncated, info = self.env.step(self.robust_input)
-        return observation, reward, terminated, truncated, info
+        #observation, reward, terminated, truncated, info = self.env.step(self.robust_input)
+        #return observation, reward, terminated, truncated, info
+        return super().step(self.robust_input)
