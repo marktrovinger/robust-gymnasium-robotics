@@ -14,7 +14,7 @@ import tyro
 from torch.distributions.normal import Normal
 from torch.utils.tensorboard import SummaryWriter
 from robust_gymnasium.configs.robust_setting import get_config
-from action_injection_wrapper import VectorActionInjection, ActionInjectionWrapper
+from action_injection_wrapper import VectorActionInjection, ActionInjection
 
 
 @dataclass
@@ -49,7 +49,7 @@ class Args:
     """total timesteps of the experiments"""
     learning_rate: float = 3e-4
     """the learning rate of the optimizer"""
-    num_envs: int = 1
+    num_envs: int = 20
     """the number of parallel game environments"""
     num_steps: int = 2048
     """the number of steps to run in each environment per policy rollout"""
@@ -97,7 +97,7 @@ def make_env(env_id, idx, capture_video, run_name, gamma):
         #env = VectorActionInjection(env, {"robust_type" : "state","robust_config": robust_args})
         #env = gym.wrappers.vector.FlattenObservation(env)  # deal with dm_control's Dict observation space
         #env = gym.wrappers.RecordEpisodeStatistics(env)
-        #env = gym.wrappers.vector.vectorize_action.ClipAction(env)
+        #env = gym.wrappers.vector.ClipAction(env)
         # env = gym.wrappers.vector.NormalizeObservation(env)
         # env = gym.wrappers.vector.TransformObservation(env= env, func=lambda obs: np.clip(obs, -10, 10), observation_space=None)
         # env = gym.wrappers.vector.NormalizeReward(env, gamma=gamma)
@@ -185,14 +185,14 @@ if __name__ == "__main__":
     # envs = gym.vector.SyncVectorEnv(
     #     [make_env(args.env_id, i, args.capture_video, run_name, args.gamma) for i in range(args.num_envs)]
     # )
-    # envs = gym.vector.SyncVectorEnv(
-    #     [make_env(robust_args.env_name, i, args.capture_video, run_name, args.gamma) for i in range(args.num_envs)]
-    # )
+    envs = gym.vector.SyncVectorEnv(
+        [make_env(robust_args.env_name, i, args.capture_video, run_name, args.gamma) for i in range(args.num_envs)]
+    )
     #envs = gym.make_vec(robust_args.env_name, num_envs=1, vectorization_mode="sync")
     #envs = env = VectorActionInjection(envs, {"robust_type" : "state","robust_config": robust_args})
     
-    envs = gym.make(robust_args.env_name)
-    envs = ActionInjectionWrapper(envs, {"robust_type" : "state","robust_config": robust_args})
+    #envs = gym.make(robust_args.env_name)
+    #envs = ActionInjection(envs, {"robust_type" : "state","robust_config": robust_args})
     #envs = gym.make_vec("CartPole-v1", num_envs=3, vectorization_mode="sync", wrappers=(gym.wrappers.TimeAwareObservation,))
 
     
