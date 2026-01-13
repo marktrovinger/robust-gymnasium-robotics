@@ -20,10 +20,10 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
     && uv pip install tyro \
     && uv pip install jax[cuda12] \
     && uv pip install tensorboard \
-    && uv pip install stable-baselines3[extra] \
+    && uv pip install stable-baselines3 \
     && cd Robust-Gymnasium \
     && uv pip install -r requirements.txt  \
-    && uv pip install .
+    && uv pip install -e .
 
 RUN . $HOME/.local/bin/env \
     && . venv/bin/activate \
