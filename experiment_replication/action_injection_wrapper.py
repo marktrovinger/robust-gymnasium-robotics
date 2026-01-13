@@ -23,18 +23,19 @@ class VectorActionInjection(VectorWrapper):
         observation, reward, terminated, truncated, info = self.env.step(self.robust_input)
         return observation, reward, terminated, truncated, info
 
-class ActionInjectionWrapper(gym.ObservationWrapper):
+class ActionInjection(gym.Wrapper):
     def __init__(
             self,
             env: gym.Env,
             robust_input: dict,
-            action_space: Space | None = None,
+            #action_space: Space | None = None,
         ):
-        super().__init__(env)
+        gym.Wrapper.__init__(self, env)
         self.env = env
         self.robust_input = robust_input
 
     def step(self, action):
         self.robust_input["action"] = action
-        observation, reward, terminated, truncated, info = self.env.step(self.robust_input)
-        return observation, reward, terminated, truncated, info
+        #observation, reward, terminated, truncated, info = self.env.step(self.robust_input)
+        #return observation, reward, terminated, truncated, info
+        return super().step(self.robust_input)
