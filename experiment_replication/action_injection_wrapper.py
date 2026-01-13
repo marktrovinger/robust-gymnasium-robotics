@@ -26,7 +26,7 @@ class VectorActionInjection(VectorWrapper):
 class ActionInjectionWrapper(gym.ObservationWrapper):
     def __init__(
             self,
-            env,
+            env: gym.Env,
             robust_input: dict,
             action_space: Space | None = None,
         ):
