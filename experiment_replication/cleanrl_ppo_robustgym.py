@@ -14,7 +14,7 @@ import tyro
 from torch.distributions.normal import Normal
 from torch.utils.tensorboard import SummaryWriter
 from robust_gymnasium.configs.robust_setting import get_config
-from action_injection_wrapper import VectorActionInjection, ActionInjection
+from action_injection_wrapper import VectorActionInjection, ActionInjectionWrapper
 
 
 @dataclass
