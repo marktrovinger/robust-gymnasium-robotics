@@ -1,6 +1,6 @@
 import robust_gymnasium as gym
 from robust_gymnasium.configs.robust_setting import get_config
-import gymnasium as gym
+#import gymnasium as gym
 #from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_checker import check_env
