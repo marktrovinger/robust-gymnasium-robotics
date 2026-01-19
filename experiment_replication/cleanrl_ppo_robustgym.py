@@ -49,7 +49,7 @@ class Args:
     """total timesteps of the experiments"""
     learning_rate: float = 3e-4
     """the learning rate of the optimizer"""
-    num_envs: int = 20
+    num_envs: int = 1
     """the number of parallel game environments"""
     num_steps: int = 2048
     """the number of steps to run in each environment per policy rollout"""
@@ -185,10 +185,10 @@ if __name__ == "__main__":
     # envs = gym.vector.SyncVectorEnv(
     #     [make_env(args.env_id, i, args.capture_video, run_name, args.gamma) for i in range(args.num_envs)]
     # )
-    envs = gym.vector.SyncVectorEnv(
-        [make_env(robust_args.env_name, i, args.capture_video, run_name, args.gamma) for i in range(args.num_envs)]
-    )
-    #envs = gym.make_vec(robust_args.env_name, num_envs=1, vectorization_mode="sync")
+    # envs = gym.vector.SyncVectorEnv(
+    #     [make_env(robust_args.env_name, i, args.capture_video, run_name, args.gamma) for i in range(args.num_envs)]
+    # )
+    envs = gym.make_vec(robust_args.env_name, num_envs=1, vectorization_mode="sync")
     #envs = env = VectorActionInjection(envs, {"robust_type" : "state","robust_config": robust_args})
     
     #envs = gym.make(robust_args.env_name)
@@ -242,7 +242,7 @@ if __name__ == "__main__":
                 }
                 values[step] = value.flatten()
             actions[step] = action
-            #logprobs[step] = logprob
+            logprobs[step] = logprob
             robust_inputs.append(robust_input)
 
             # TRY NOT TO MODIFY: execute the game and log data.
