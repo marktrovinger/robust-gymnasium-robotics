@@ -21,6 +21,7 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
     && uv pip install jax[cuda12] \
     && uv pip install tensorboard \
     && uv pip install stable-baselines3 \
+    && uv pip install wandb \
     && cd Robust-Gymnasium \
     && uv pip install -r requirements.txt  \
     && uv pip install -e .
